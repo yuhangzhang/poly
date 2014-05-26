@@ -36,6 +36,7 @@ void poly<T>::addTerm(const std::vector<int>& vars, T coeff)
 	}
 
 	if(vars.back()>_lastvar) _lastvar = vars.back();
+	if(int(vars.size())>_order ) _order = int(vars.size());
 
 	return;
 }
@@ -57,59 +58,162 @@ T poly<T>::getTerm(const std::vector<int>& vars)
 
 }
 
-//template<class T>
-//poly<T> poly<T>::operator+(poly<T> p) 
-//{
-//	int newnumvar = (_numvar>qpbf._numvar)?_numvar:qpbf._numvar;
-//
-//	QPBpoly<T> newqpbf;
-//
-//	QPBF::key_compare less= _QPBcoeff.key_comp();
-//
-//	QPBF::iterator it1=_QPBcoeff.begin(), it2=qpbf.firstTerm();
-//	
-//	for(;it1!=_QPBcoeff.end()&&it2!=qpbf.lastTerm();)
-//	{
-//		if(less(it1->first,it2->first))
-//		{
-//			newqpbf.addTerm2(it1->first.first,it1->first.second,it1->second);
-//
-//			it1++;
-//		}
-//		else if(less(it2->first,it1->first))
-//		{
-//			newqpbf.addTerm2(it2->first.first,it2->first.second,it2->second);
-//
-//			it2++;				
-//		}
-//		else
-//		{
-//			newqpbf.addTerm2(it1->first.first,it1->first.second,it1->second+it2->second);
-//			
-//			it1++;
-//			it2++;			
-//		}
-//	}
-//
-//	for(;it1!=_QPBcoeff.end();it1++)
-//	{
-//		newqpbf.addTerm2(it1->first.first,it1->first.second,it1->second);
-//	}
-//
-//	for(;it2!=qpbf.lastTerm();it2++)
-//	{
-//		newqpbf.addTerm2(it2->first.first,it2->first.second,it2->second);
-//	}
-//
-//
-//
-//	return newqpbf;
-//}
+template<class T>
+poly<T> poly<T>::operator+(poly<T> p) 
+{
+	poly<T> newp;
 
-//template <class T>
-//typename TERMS::iterator poly<T>::lastTerm()
-//{
-//
-//}
+	TERMS::key_compare less= _polynomial.key_comp();
+
+	TERMS::iterator it1;
+	TERMS::iterator it2;
+	
+	for(it1=_polynomial.begin(),it2=p.firstTerm();it1!=_polynomial.end()&&it2!=p.lastTerm();)
+	{
+		if(less(it1->first,it2->first))
+		{
+			newp.addTerm(it1->first,it1->second);
+
+			it1++;
+		}
+		else if(less(it2->first,it1->first))
+		{
+			newp.addTerm(it2->first,it2->second);
+
+			it2++;				
+		}
+		else
+		{
+			newp.addTerm(it1->first,it1->second+it2->second);
+
+			it1++;
+			it2++;			
+		}
+	}
+
+	for(;it1!=_polynomial.end();it1++)
+	{
+		newp.addTerm(it1->first,it1->second);
+	}
+
+	for(;it2!=p.lastTerm();it2++)
+	{
+		newp.addTerm(it2->first,it2->second);
+	}
+
+
+
+	return newp;
+}
+
+template<class T>
+poly<T> poly<T>::operator-(poly<T> p) 
+{
+	poly<T> newp;
+
+	TERMS::key_compare less= _polynomial.key_comp();
+
+	TERMS::iterator it1;
+	TERMS::iterator it2;
+	
+	for(it1=_polynomial.begin(),it2=p.firstTerm();it1!=_polynomial.end()&&it2!=p.lastTerm();)
+	{
+		if(less(it1->first,it2->first))
+		{
+			newp.addTerm(it1->first,it1->second);
+
+			it1++;
+		}
+		else if(less(it2->first,it1->first))
+		{
+			newp.addTerm(it2->first,-(it2->second));
+
+			it2++;				
+		}
+		else
+		{
+			newp.addTerm(it1->first,it1->second-it2->second);
+
+			it1++;
+			it2++;			
+		}
+	}
+
+	for(;it1!=_polynomial.end();it1++)
+	{
+		newp.addTerm(it1->first,it1->second);
+	}
+
+	for(;it2!=p.lastTerm();it2++)
+	{
+		newp.addTerm(it2->first,-(it2->second));
+	}
+
+
+
+	return newp;
+}
+
+
+template<class T>
+poly<T> poly<T>::operator*(T u) 
+{
+	poly<T> newp;
+
+	TERMS::iterator it;
+	
+	for(it=_polynomial.begin();it!=_polynomial.end();it++)
+	{
+		newp.addTerm(it->first,(it->second)*u);
+	}
+
+	return newp;
+}
+
+
+template <class T>
+typename poly<T>::TERMS::iterator poly<T>::firstTerm()
+{
+	return _polynomial.begin();
+}
+
+template <class T>
+typename poly<T>::TERMS::iterator poly<T>::lastTerm()
+{
+	return _polynomial.end();
+}
+
+
+template<class T>
+void poly<T>::destroy()
+{
+	_lastvar = 0;
+	_order = 0;
+	_polynomial.clear();
+	return;
+
+}
+
+template<class T>
+void poly<T>::clean()
+{
+	_lastvar = 0;
+	_order = 0;
+
+	for(TERMS::iterator it=_polynomial.begin();it!=_polynomial.end();)
+	{
+		TERMS::iterator it2=it;
+		it++;
+
+		if(it2->second==0) _polynomial.erase(it2);
+		else
+		{
+			if(it2->first.back()>_lastvar) _lastvar = it2->first.back();
+			if(it2->first.size()>_order ) _order = int(it2->first.size());
+		}
+	}
+
+	return;
+}
 
 #endif
