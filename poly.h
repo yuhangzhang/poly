@@ -1,8 +1,5 @@
 #include <map>
 #include <vector>
-//#include <Eigen/core>
-//#include <Eigen/Dense>
-//#include <Eigen/SparseCore>
 
 using namespace std;
 
@@ -14,15 +11,32 @@ class poly
 {
 public:
 	typedef typename std::map<vector<int>,T> TERMS;
-	poly(int numvar, int order);
-	int numterm();//return the number of terms with nonezero parameters
-	int maxsize();//return the max number of terms in this polynomial
+	poly();
+	int numTerm();//return the number of terms with nonezero parameters
+	int lastVar();//return the largest variable-id
+
+	void addTerm(const std::vector<int>& vars, T coeff);
+	T getTerm(const std::vector<int>& vars);
+	poly<T> operator+(poly<T> p);
+	poly<T> operator-(poly<T> p);
+	poly<T> operator*(T u);
+
+
+	typename TERMS::iterator firstTerm();
+	typename TERMS::iterator lastTerm();//not really a term, but a node behind the last
+	
+	void destroy();//remove all terms
+	void clean();//remove 0 terms
+	
+
+
+	T evaluate(const std::vector<T>& ass);
+
+
 private:
-	int combination(int m, int n);//return m choose n, m>=n
-	int termid(const vector<int>& vars);//return the serial number of the input term in this polynomial
 	TERMS _polynomial;//the real container of the polynoimal
 
-	int _numvar;
+	int _lastvar;
 	int _order;
 	
 };

@@ -4,85 +4,112 @@
 #define _POLY_CPP_
 
 template<class T>
-poly<T>::poly(int numvar, int order)
+poly<T>::poly()
 {
-	_numvar = numvar;
+	_lastvar = 0;
 
-	_order = order;
+	_order = 0;
 
 	return;
 }
 
 template<class T>
-int poly<T>::termid(const vector<int>& vars)
+int poly<T>::numTerm()
 {
-	int id=0;
-	for(int i=1;i<=vars.size();i++)
-	{
-		id += combination(_numvar,i);
-	}
-
-	int order=vars.size();
-	for (vector<int>::const_iterator it = vars.begin(); it != vars.end(); it++) 
-	{
-		id += it
-	}
-}
-
-template<class T>
-int poly<T>::numterm()
-{
-	//clean 0 terms first
-	for(TERMS::iterator it=_polynomial.begin();it!=_polynomial.end();)
-	{
-		TERMS::iterator tit=it++;
-
-		if(tit->second==0) _polynomial.erase(tit);
-	}
-
 	return _polynomial.size();
 }
 
 template<class T>
-int poly<T>::maxsize()
+int poly<T>::lastVar()
 {
-	int total = 0;
-
-	for(int i=1;i<=_order;i++)
-	{
-		total += combination(_numvar,i);
-	}
-
-	return total;
+	return _lastvar;
 }
 
 template<class T>
-int poly<T>::combination(int m, int n)
+void poly<T>::addTerm(const std::vector<int>& vars, T coeff)
 {
-	if(n>m)
+	std::pair<TERMS::iterator, bool> it = _polynomial.insert(std::make_pair(vars,coeff));
+
+	if(it.second==false)//already got this term
 	{
-		return -1;
+			(it.first)->second += coeff;
 	}
-	else if(n==0) 
+
+	if(vars.back()>_lastvar) _lastvar = vars.back();
+
+	return;
+}
+
+
+template<class T>
+T poly<T>::getTerm(const std::vector<int>& vars)
+{
+	TERMS::iterator it = _polynomial.find(vars);
+
+	if(it == _polynomial.end())//already got this term
 	{
-			return 1;
+		return 0;
 	}
 	else
 	{
-		int total = 1;
-	
-		for(int i=m;i>m-n;i--)
-		{
-			total *= i;
-		}
-
-		for(int i=n;i>0;i--)
-		{
-			total /= i;
-		}
-
-		return total;
+		return it->second;
 	}
+
 }
+
+//template<class T>
+//poly<T> poly<T>::operator+(poly<T> p) 
+//{
+//	int newnumvar = (_numvar>qpbf._numvar)?_numvar:qpbf._numvar;
+//
+//	QPBpoly<T> newqpbf;
+//
+//	QPBF::key_compare less= _QPBcoeff.key_comp();
+//
+//	QPBF::iterator it1=_QPBcoeff.begin(), it2=qpbf.firstTerm();
+//	
+//	for(;it1!=_QPBcoeff.end()&&it2!=qpbf.lastTerm();)
+//	{
+//		if(less(it1->first,it2->first))
+//		{
+//			newqpbf.addTerm2(it1->first.first,it1->first.second,it1->second);
+//
+//			it1++;
+//		}
+//		else if(less(it2->first,it1->first))
+//		{
+//			newqpbf.addTerm2(it2->first.first,it2->first.second,it2->second);
+//
+//			it2++;				
+//		}
+//		else
+//		{
+//			newqpbf.addTerm2(it1->first.first,it1->first.second,it1->second+it2->second);
+//			
+//			it1++;
+//			it2++;			
+//		}
+//	}
+//
+//	for(;it1!=_QPBcoeff.end();it1++)
+//	{
+//		newqpbf.addTerm2(it1->first.first,it1->first.second,it1->second);
+//	}
+//
+//	for(;it2!=qpbf.lastTerm();it2++)
+//	{
+//		newqpbf.addTerm2(it2->first.first,it2->first.second,it2->second);
+//	}
+//
+//
+//
+//	return newqpbf;
+//}
+
+//template <class T>
+//typename TERMS::iterator poly<T>::lastTerm()
+//{
+//
+//}
 
 #endif
