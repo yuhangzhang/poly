@@ -16,7 +16,7 @@ poly<T>::poly()
 template<class T>
 int poly<T>::numTerm()
 {
-	return _polynomial.size();
+	return int(_polynomial.size());
 }
 
 template<class T>
